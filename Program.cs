@@ -14,7 +14,6 @@ namespace MagniseFinAPI
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
