@@ -1,5 +1,4 @@
 ﻿using MagniseFinAPI.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagniseFinAPI.Controllers
@@ -18,9 +17,9 @@ namespace MagniseFinAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAssets()
         {
-            var token = _fintachartsService.GetBearerTokenAsync();
+            var token = await _fintachartsService.GetBearerTokenAsync();
 
-            return Ok(token);
+            return Ok();
         }
     }
 }
