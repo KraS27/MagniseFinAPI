@@ -1,3 +1,5 @@
+using MagniseFinAPI.Services;
+
 namespace MagniseFinAPI
 {
     public class Program
@@ -8,6 +10,9 @@ namespace MagniseFinAPI
 
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
+
+            builder.Services.AddScoped<IFintachartsService, FintachartsService>();
+
             var app = builder.Build();
 
             app.UseHttpsRedirection();
