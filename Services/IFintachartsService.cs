@@ -2,7 +2,6 @@
 {
     public interface IFintachartsService
     {
-        public Task<string> GetBearerTokenAsync();
-
+        public Task GetBearerTokenAsync();
     }
 }

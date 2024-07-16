@@ -1,4 +1,5 @@
 ﻿using MagniseFinAPI.Models;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Text.Json;
 
@@ -6,24 +7,35 @@ namespace MagniseFinAPI.Services
 {   
     public class FintachartsService : IFintachartsService
     {
-        private readonly HttpClient _httpClient;
-        private readonly FintachartsLoginSettings _loginSettings;
+        private readonly HttpClient _httpClient;  
+        private readonly IConfiguration _configuration;
+        private static string _token = string.Empty;
+        private DateTime _tokenExpiryTime = DateTime.MinValue;
 
-        public FintachartsService(HttpClient httpClient, FintachartsLoginSettings loginSettings)
+        public FintachartsService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
-            _loginSettings = loginSettings;
+            _configuration = configuration;
         }
 
-        public async Task<string> GetBearerTokenAsync()
+        public async Task GetBearerTokenAsync()
+        {
+            if (string.IsNullOrEmpty(_token) || DateTime.UtcNow >= _tokenExpiryTime)
+            {
+                await RefreshTokenAsync();
+            }           
+        }
+
+        private async Task RefreshTokenAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://platform.fintacharts.com/identity/realms/fintatech/protocol/openid-connect/token");
+            var loginSettings = _configuration.GetSection("LoginSettings").Get<FintachartsLoginSettings>()!;
             var parameters = new Dictionary<string, string>
             {
-                { "username", _loginSettings.Username },
-                { "password", _loginSettings.Password },
-                { "grant_type", _loginSettings.GrantType },
-                { "client_id", _loginSettings.ClientId }
+                { "username", loginSettings.Username },
+                { "password", loginSettings.Password },
+                { "grant_type", loginSettings.GrantType },
+                { "client_id", loginSettings.ClientId }
             };
 
             request.Content = new FormUrlEncodedContent(parameters);
@@ -33,9 +45,12 @@ namespace MagniseFinAPI.Services
             response.EnsureSuccessStatusCode();
 
             var responseData = await response.Content.ReadAsStringAsync();
-            var token = JsonSerializer.Deserialize<JsonElement>(responseData).GetProperty("access_token").GetString();
+            var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseData);
 
-            return token;
+            _token = jsonResponse.GetProperty("access_token").GetString()!;
+            var expiresIn = jsonResponse.GetProperty("expires_in").GetInt32();
+
+            _tokenExpiryTime = DateTime.UtcNow.AddSeconds(expiresIn).AddMinutes(-1); 
         }
     }
 }

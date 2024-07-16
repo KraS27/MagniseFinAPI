@@ -11,7 +11,7 @@ namespace MagniseFinAPI
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
 
-            builder.Services.AddScoped<IFintachartsService, FintachartsService>();
+            builder.Services.AddSingleton<IFintachartsService, FintachartsService>();
 
             var app = builder.Build();
 

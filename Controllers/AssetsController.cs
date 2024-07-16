@@ -17,7 +17,7 @@ namespace MagniseFinAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAssets()
         {
-            var token = await _fintachartsService.GetBearerTokenAsync();
+            await _fintachartsService.GetBearerTokenAsync();
 
             return Ok();
         }
