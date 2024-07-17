@@ -23,6 +23,7 @@ namespace MagniseFinAPI
 
             builder.Services.AddSingleton<IFintachartsService, FintachartsService>();
             builder.Services.AddScoped<IMarketAssetsService, MarketAssetsService>();
+            builder.Services.AddHostedService<MarketAssetsUpdateService>();
 
 
             var app = builder.Build();

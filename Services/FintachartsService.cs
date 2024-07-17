@@ -130,7 +130,6 @@ namespace MagniseFinAPI.Services
             existingAsset.Description = incomingAsset.Description;
             existingAsset.TickSize = incomingAsset.TickSize;
             existingAsset.Currency = incomingAsset.Currency;
-            existingAsset.Mappings = incomingAsset.Mappings;
         }
     }
 }
