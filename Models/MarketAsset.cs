@@ -16,6 +16,6 @@
 
         public string Currency { get; set; } = string.Empty;
 
-        public Mappings? Mappings { get; set; }
+        public ICollection<Mapping>? Mappings { get; set; }
     }
 }

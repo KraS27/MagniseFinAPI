@@ -1,4 +1,7 @@
+using MagniseFinAPI.DB;
 using MagniseFinAPI.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace MagniseFinAPI
 {
@@ -7,11 +10,19 @@ namespace MagniseFinAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
+
             builder.Services.AddHttpClient();
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 
             builder.Services.AddSingleton<IFintachartsService, FintachartsService>();
+
 
             var app = builder.Build();
 

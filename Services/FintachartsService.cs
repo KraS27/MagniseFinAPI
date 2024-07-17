@@ -68,10 +68,12 @@ namespace MagniseFinAPI.Services
             using (JsonDocument doc = JsonDocument.Parse(responseData))
             {
                 var data = doc.RootElement.GetProperty("data").GetRawText();
-                var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, new JsonSerializerOptions
+                var options = new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
-                });               
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new MappingConverter() }
+                };
+                var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, options);
             }            
         }
     }
