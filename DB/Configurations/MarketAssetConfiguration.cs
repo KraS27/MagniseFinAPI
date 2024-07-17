@@ -25,8 +25,7 @@ namespace MagniseFinAPI.DB.Configurations
                 .UsingEntity<MarketAssetsMapping>(
                 l => l.HasOne<Mapping>().WithMany().HasForeignKey(m => m.MappingId),
                 r => r.HasOne<MarketAsset>().WithMany().HasForeignKey(a => a.MarketAssetsId),
-                t => t.ToTable("mapping_assets")
-                );
+                t => t.ToTable("mapping_assets"));
         }
     }
 }
