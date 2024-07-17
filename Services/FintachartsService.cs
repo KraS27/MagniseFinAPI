@@ -64,6 +64,15 @@ namespace MagniseFinAPI.Services
             response.EnsureSuccessStatusCode();
 
             var responseData = await response.Content.ReadAsStringAsync();
+
+            using (JsonDocument doc = JsonDocument.Parse(responseData))
+            {
+                var data = doc.RootElement.GetProperty("data").GetRawText();
+                var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });               
+            }            
         }
     }
 }
