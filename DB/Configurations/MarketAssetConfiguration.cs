@@ -21,8 +21,7 @@ namespace MagniseFinAPI.DB.Configurations
             builder.Property(x => x.Currency).HasColumnName("currency");
 
             builder.HasMany(a => a.Mappings)
-                .WithOne(m => m.MarketAsset)
-                .HasForeignKey(m => m.MarketAssetId);
+                .WithOne(m => m.MarketAsset);
         }
     }
 }

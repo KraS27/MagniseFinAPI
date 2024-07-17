@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagniseFinAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240717143343_Init")]
+    [Migration("20240717145329_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -26,30 +26,26 @@ namespace MagniseFinAPI.Migrations
 
             modelBuilder.Entity("MagniseFinAPI.Models.Mapping", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Symbol")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("symbol");
+
+                    b.Property<string>("Exchange")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("exchange");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("name");
 
                     b.Property<int>("DefaultOrderSize")
                         .HasColumnType("int")
                         .HasColumnName("defaulrOrderSize");
 
-                    b.Property<string>("Exchange")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("exchange");
-
                     b.Property<string>("MarketAssetId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Symbol")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("symbol");
-
-                    b.HasKey("Id");
+                    b.HasKey("Symbol", "Exchange", "Name");
 
                     b.HasIndex("MarketAssetId");
 

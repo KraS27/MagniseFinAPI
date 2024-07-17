@@ -31,16 +31,15 @@ namespace MagniseFinAPI.Migrations
                 name: "mappings",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    symbol = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    exchange = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    symbol = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    exchange = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     defaulrOrderSize = table.Column<int>(type: "int", nullable: false),
                     MarketAssetId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_mappings", x => x.Id);
+                    table.PrimaryKey("PK_mappings", x => new { x.symbol, x.exchange, x.name });
                     table.ForeignKey(
                         name: "FK_mappings_market_assets_MarketAssetId",
                         column: x => x.MarketAssetId,

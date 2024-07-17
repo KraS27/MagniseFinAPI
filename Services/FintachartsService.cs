@@ -67,7 +67,9 @@ namespace MagniseFinAPI.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var existingMarketAssets = await dbContext.MarketAssets.ToListAsync();
+                var existingMarketAssets = await dbContext.MarketAssets
+                    .Include(x => x.Mappings)
+                    .ToListAsync();
 
                 foreach (var incomingAsset in incomingMarketAssets)
                 {
@@ -91,7 +93,7 @@ namespace MagniseFinAPI.Services
             }
         }
 
-        private async Task<IEnumerable<MarketAsset>?> GetMarketAssets()
+        private async Task<IEnumerable<MarketAsset>> GetMarketAssets()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments?size=100");
             var token = await GetBearerTokenAsync();
@@ -112,7 +114,7 @@ namespace MagniseFinAPI.Services
             };
             var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, options);
 
-            return marketAssets;
+            return marketAssets ?? new List<MarketAsset>();
         }
 
         private bool AssetHasChanged(MarketAsset existingAsset, MarketAsset incomingAsset)
