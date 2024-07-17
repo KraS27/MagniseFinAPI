@@ -4,6 +4,6 @@
     {
         public Task<string> GetBearerTokenAsync();
 
-        public Task UpdateMarketAssets();
+        public Task UpdateMarketAssetsAsync();
     }
 }

@@ -2,7 +2,6 @@
 using MagniseFinAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace MagniseFinAPI.Services
 {   
@@ -60,9 +59,9 @@ namespace MagniseFinAPI.Services
             _tokenExpiryTime = DateTime.UtcNow.AddSeconds(expiresIn).AddMinutes(-1); 
         }
 
-        public async Task UpdateMarketAssets()
+        public async Task UpdateMarketAssetsAsync()
         {
-            var incomingMarketAssets = await GetMarketAssets();
+            var incomingMarketAssets = await GetAssetsFromAPIAsync();
 
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -92,8 +91,7 @@ namespace MagniseFinAPI.Services
                 await dbContext.SaveChangesAsync();
             }
         }
-
-        private async Task<IEnumerable<MarketAsset>> GetMarketAssets()
+        private async Task<IEnumerable<MarketAsset>> GetAssetsFromAPIAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments?size=100");
             var token = await GetBearerTokenAsync();
@@ -126,7 +124,6 @@ namespace MagniseFinAPI.Services
                    existingAsset.TickSize != incomingAsset.TickSize ||
                    existingAsset.Currency != incomingAsset.Currency;
         }
-
         private void UpdateAsset(MarketAsset existingAsset, MarketAsset incomingAsset)
         {         
             existingAsset.Symbol = incomingAsset.Symbol;
