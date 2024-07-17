@@ -55,7 +55,7 @@ namespace MagniseFinAPI.Services
 
         public async Task UpdateMarketAssets()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments");
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments?size=100");
             var token = await GetBearerTokenAsync();
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
