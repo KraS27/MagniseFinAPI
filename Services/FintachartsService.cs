@@ -16,12 +16,14 @@ namespace MagniseFinAPI.Services
             _configuration = configuration;
         }
 
-        public async Task GetBearerTokenAsync()
+        public async Task<string> GetBearerTokenAsync()
         {
             if (string.IsNullOrEmpty(_token) || DateTime.UtcNow >= _tokenExpiryTime)
             {
                 await RefreshTokenAsync();
             }           
+
+            return _token;
         }
 
         private async Task RefreshTokenAsync()
@@ -51,6 +53,17 @@ namespace MagniseFinAPI.Services
             _tokenExpiryTime = DateTime.UtcNow.AddSeconds(expiresIn).AddMinutes(-1); 
         }
 
-        public async 
+        public async Task UpdateMarketAssets()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments");
+            var token = await GetBearerTokenAsync();
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            var responseData = await response.Content.ReadAsStringAsync();
+        }
     }
 }
