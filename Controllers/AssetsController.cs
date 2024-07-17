@@ -1,6 +1,7 @@
 ﻿using MagniseFinAPI.Models;
 using MagniseFinAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace MagniseFinAPI.Controllers
 {
@@ -22,7 +23,11 @@ namespace MagniseFinAPI.Controllers
             {
                 var assets = await _marketAssetsService.GetAllAsync(new Pagination<MarketAsset>(page, pageSize));
 
-                return Ok(assets);
+                return Ok(new {Count = assets.Count(), data = assets});
+            }
+            catch (PaginationException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

@@ -22,7 +22,7 @@ namespace MagniseFinAPI
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 
             builder.Services.AddSingleton<IFintachartsService, FintachartsService>();
-            builder.Services.AddSingleton<IMarketAssetsService, MarketAssetsService>();
+            builder.Services.AddScoped<IMarketAssetsService, MarketAssetsService>();
 
 
             var app = builder.Build();
