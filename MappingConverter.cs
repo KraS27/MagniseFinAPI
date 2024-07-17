@@ -1,6 +1,6 @@
-﻿using MagniseFinAPI.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Text.Json;
+using MagniseFinAPI.Models;
 
 namespace MagniseFinAPI
 {

@@ -1,4 +1,6 @@
-﻿namespace MagniseFinAPI.Services
+﻿using MagniseFinAPI.Models;
+
+namespace MagniseFinAPI.Services
 {
     public interface IFintachartsService
     {

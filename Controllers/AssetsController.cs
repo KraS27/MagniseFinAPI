@@ -1,4 +1,5 @@
-﻿using MagniseFinAPI.Services;
+﻿using MagniseFinAPI.Models;
+using MagniseFinAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagniseFinAPI.Controllers
@@ -7,19 +8,27 @@ namespace MagniseFinAPI.Controllers
     [ApiController]
     public class AssetsController : ControllerBase
     {
-        private readonly IFintachartsService _fintachartsService;
+        private readonly IMarketAssetsService _marketAssetsService;
 
-        public AssetsController(IFintachartsService fintachartsService)
+        public AssetsController(IMarketAssetsService marketAssetsService)
         {
-            _fintachartsService = fintachartsService;
+            _marketAssetsService = marketAssetsService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAssets()
+        public async Task<IActionResult> GetAllAssets([FromQuery] int page = 1, [FromQuery] int pageSize = 5)
         {
-            await _fintachartsService.UpdateMarketAssets();
+            try
+            {
+                var assets = await _marketAssetsService.GetAllAsync(new Pagination<MarketAsset>(page, pageSize));
 
-            return Ok();
+                return Ok(assets);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "An unexpected error occurred. Please try again later." });
+            }
+
         }
     }
 }

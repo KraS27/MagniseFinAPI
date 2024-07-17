@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace MagniseFinAPI.Services
-{   
+{
     public class FintachartsService : IFintachartsService
     {
         private readonly HttpClient _httpClient;  
@@ -66,9 +66,7 @@ namespace MagniseFinAPI.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var existingMarketAssets = await dbContext.MarketAssets
-                    .Include(x => x.Mappings)
-                    .ToListAsync();
+                var existingMarketAssets = await dbContext.MarketAssets.ToListAsync();
 
                 foreach (var incomingAsset in incomingMarketAssets)
                 {
