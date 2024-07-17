@@ -23,9 +23,8 @@ namespace MagniseFinAPI.Migrations
 
             modelBuilder.Entity("MagniseFinAPI.Models.Mapping", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("name");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("DefaultOrderSize")
                         .HasColumnType("int")
@@ -35,11 +34,21 @@ namespace MagniseFinAPI.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("exchange");
 
+                    b.Property<string>("MarketAssetId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("name");
+
                     b.Property<string>("Symbol")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("symbol");
 
-                    b.HasKey("Name");
+                    b.HasKey("Id");
+
+                    b.HasIndex("MarketAssetId");
 
                     b.ToTable("mappings", (string)null);
                 });
@@ -84,34 +93,18 @@ namespace MagniseFinAPI.Migrations
                     b.ToTable("market_assets", (string)null);
                 });
 
-            modelBuilder.Entity("MagniseFinAPI.Models.MarketAssetsMapping", b =>
+            modelBuilder.Entity("MagniseFinAPI.Models.Mapping", b =>
                 {
-                    b.Property<string>("MappingId")
-                        .HasColumnType("nvarchar(450)");
+                    b.HasOne("MagniseFinAPI.Models.MarketAsset", "MarketAsset")
+                        .WithMany("Mappings")
+                        .HasForeignKey("MarketAssetId");
 
-                    b.Property<string>("MarketAssetsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("MappingId", "MarketAssetsId");
-
-                    b.HasIndex("MarketAssetsId");
-
-                    b.ToTable("mapping_assets", (string)null);
+                    b.Navigation("MarketAsset");
                 });
 
-            modelBuilder.Entity("MagniseFinAPI.Models.MarketAssetsMapping", b =>
+            modelBuilder.Entity("MagniseFinAPI.Models.MarketAsset", b =>
                 {
-                    b.HasOne("MagniseFinAPI.Models.Mapping", null)
-                        .WithMany()
-                        .HasForeignKey("MappingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MagniseFinAPI.Models.MarketAsset", null)
-                        .WithMany()
-                        .HasForeignKey("MarketAssetsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Mappings");
                 });
 #pragma warning restore 612, 618
         }

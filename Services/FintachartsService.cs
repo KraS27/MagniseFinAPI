@@ -1,5 +1,8 @@
-﻿using MagniseFinAPI.Models;
+﻿using MagniseFinAPI.DB;
+using MagniseFinAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace MagniseFinAPI.Services
 {   
@@ -7,13 +10,17 @@ namespace MagniseFinAPI.Services
     {
         private readonly HttpClient _httpClient;  
         private readonly IConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
         private static string _token = string.Empty;
         private DateTime _tokenExpiryTime = DateTime.MinValue;
 
-        public FintachartsService(HttpClient httpClient, IConfiguration configuration)
+        public FintachartsService(HttpClient httpClient, 
+            IConfiguration configuration,
+            IServiceProvider serviceProvider)
         {
             _httpClient = httpClient;
             _configuration = configuration;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<string> GetBearerTokenAsync()
@@ -55,6 +62,37 @@ namespace MagniseFinAPI.Services
 
         public async Task UpdateMarketAssets()
         {
+            var incomingMarketAssets = await GetMarketAssets();
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var existingMarketAssets = await dbContext.MarketAssets.ToListAsync();
+
+                foreach (var incomingAsset in incomingMarketAssets)
+                {
+                    var existingAsset = existingMarketAssets.FirstOrDefault(e => e.Id == incomingAsset.Id);
+
+                    if (existingAsset != null)
+                    {
+                        if (AssetHasChanged(existingAsset, incomingAsset))
+                        {
+                            UpdateAsset(existingAsset, incomingAsset);
+                            dbContext.MarketAssets.Update(existingAsset);
+                        }
+                    }
+                    else
+                    {
+                        dbContext.MarketAssets.Add(incomingAsset);
+                    }
+                }
+
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task<IEnumerable<MarketAsset>?> GetMarketAssets()
+        {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://platform.fintacharts.com/api/instruments/v1/instruments?size=100");
             var token = await GetBearerTokenAsync();
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -65,16 +103,37 @@ namespace MagniseFinAPI.Services
 
             var responseData = await response.Content.ReadAsStringAsync();
 
-            using (JsonDocument doc = JsonDocument.Parse(responseData))
+            using JsonDocument doc = JsonDocument.Parse(responseData);
+            var data = doc.RootElement.GetProperty("data").GetRawText();
+            var options = new JsonSerializerOptions
             {
-                var data = doc.RootElement.GetProperty("data").GetRawText();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new MappingConverter() }
-                };
-                var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, options);
-            }            
+                PropertyNameCaseInsensitive = true,
+                Converters = { new MappingConverter() }
+            };
+            var marketAssets = JsonSerializer.Deserialize<List<MarketAsset>>(data, options);
+
+            return marketAssets;
+        }
+
+        private bool AssetHasChanged(MarketAsset existingAsset, MarketAsset incomingAsset)
+        {            
+            return existingAsset.Symbol != incomingAsset.Symbol ||
+                   existingAsset.Kind != incomingAsset.Kind ||
+                   existingAsset.Exchange != incomingAsset.Exchange ||
+                   existingAsset.Description != incomingAsset.Description ||
+                   existingAsset.TickSize != incomingAsset.TickSize ||
+                   existingAsset.Currency != incomingAsset.Currency;
+        }
+
+        private void UpdateAsset(MarketAsset existingAsset, MarketAsset incomingAsset)
+        {         
+            existingAsset.Symbol = incomingAsset.Symbol;
+            existingAsset.Kind = incomingAsset.Kind;
+            existingAsset.Exchange = incomingAsset.Exchange;
+            existingAsset.Description = incomingAsset.Description;
+            existingAsset.TickSize = incomingAsset.TickSize;
+            existingAsset.Currency = incomingAsset.Currency;
+            existingAsset.Mappings = incomingAsset.Mappings;
         }
     }
 }

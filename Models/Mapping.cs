@@ -2,6 +2,8 @@
 {
     public class Mapping
     {
+        public string Id { get; set; } = string.Empty;
+
         public string Name { get; set; } = string.Empty;
 
         public string? Symbol { get; set; }
@@ -10,6 +12,7 @@
 
         public int DefaultOrderSize { get; set; }
 
-        public ICollection<MarketAsset>? MarketAssets { get; set; }
+        public string? MarketAssetId { get; set; }
+        public MarketAsset? MarketAsset { get; set; }
     }
 }

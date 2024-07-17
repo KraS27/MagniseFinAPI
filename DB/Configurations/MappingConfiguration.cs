@@ -10,7 +10,7 @@ namespace MagniseFinAPI.DB.Configurations
         {
             builder.ToTable("mappings");
 
-            builder.HasKey(x => x.Name);
+            builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Name).HasColumnName("name");
             builder.Property(x => x.Symbol).HasColumnName("symbol");
