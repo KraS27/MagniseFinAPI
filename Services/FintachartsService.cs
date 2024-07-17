@@ -1,6 +1,4 @@
 ﻿using MagniseFinAPI.Models;
-using Microsoft.Extensions.Configuration;
-using System.Text;
 using System.Text.Json;
 
 namespace MagniseFinAPI.Services
@@ -29,7 +27,7 @@ namespace MagniseFinAPI.Services
         private async Task RefreshTokenAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://platform.fintacharts.com/identity/realms/fintatech/protocol/openid-connect/token");
-            var loginSettings = _configuration.GetSection("LoginSettings").Get<FintachartsLoginSettings>()!;
+            var loginSettings = _configuration.GetSection("FintachartsLoginSettings").Get<FintachartsLoginSettings>()!;
             var parameters = new Dictionary<string, string>
             {
                 { "username", loginSettings.Username },
@@ -52,5 +50,7 @@ namespace MagniseFinAPI.Services
 
             _tokenExpiryTime = DateTime.UtcNow.AddSeconds(expiresIn).AddMinutes(-1); 
         }
+
+        public async 
     }
 }
